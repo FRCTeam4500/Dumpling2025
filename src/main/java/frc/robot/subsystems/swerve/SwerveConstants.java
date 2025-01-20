@@ -16,7 +16,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.AnalogEncoder;
 import frc.robot.hardware.Motor;
 import frc.robot.hardware.Motor.FeedforwardConstants;
 import frc.robot.hardware.Motor.TargetType;
@@ -85,9 +84,6 @@ public class SwerveConstants {
                     .positionConversionFactor(1.0 / 25)
                     .velocityConversionFactor(1.0 / 25 / 60);
                 motor.configure(config, kResetSafeParameters, kPersistParameters);
-                AnalogEncoder absoluteEncoder = new AnalogEncoder(FRONT_LEFT_ENCODER_ID);
-                motor.getEncoder().setPosition(absoluteEncoder.get() - 0.805);
-                absoluteEncoder.close();
               },
               sim -> {},
               0,
@@ -136,9 +132,6 @@ public class SwerveConstants {
                     .positionConversionFactor(1.0 / 25)
                     .velocityConversionFactor(1.0 / 25 / 60);
                 motor.configure(config, kResetSafeParameters, kPersistParameters);
-                AnalogEncoder absoluteEncoder = new AnalogEncoder(FRONT_RIGHT_ENCODER_ID);
-                motor.getEncoder().setPosition(absoluteEncoder.get() - 0.394);
-                absoluteEncoder.close();
               },
               sim -> {},
               0,
@@ -187,9 +180,6 @@ public class SwerveConstants {
                     .positionConversionFactor(1.0 / 25)
                     .velocityConversionFactor(1.0 / 25 / 60);
                 motor.configure(config, kResetSafeParameters, kPersistParameters);
-                AnalogEncoder absoluteEncoder = new AnalogEncoder(BACK_LEFT_ENCODER_ID);
-                motor.getEncoder().setPosition(absoluteEncoder.get() - 0.511);
-                absoluteEncoder.close();
               },
               sim -> {},
               0,
@@ -238,9 +228,6 @@ public class SwerveConstants {
                     .positionConversionFactor(1.0 / 25)
                     .velocityConversionFactor(1.0 / 25 / 60);
                 motor.configure(config, kResetSafeParameters, kPersistParameters);
-                AnalogEncoder absoluteEncoder = new AnalogEncoder(BACK_RIGHT_ENCODER_ID);
-                motor.getEncoder().setPosition(absoluteEncoder.get() - 0.061);
-                absoluteEncoder.close();
               },
               sim -> {},
               0,
