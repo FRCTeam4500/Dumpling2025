@@ -1,8 +1,6 @@
 package frc.robot.Robots;
 
 import java.util.Optional;
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -13,13 +11,15 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
+import frc.robot.hardware.Motor.FeedforwardConstants;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.AnalogEncoder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -32,7 +32,7 @@ import frc.robot.utilities.logging.HoundLog;
 public class SwerveTest extends TimedRobot {
     private Motor[] driveMotors = new Motor[] {
         Motor.fromTalonFX( // fl
-            1, 
+            8, 
             motor -> {
                 TalonFXConfiguration config = new TalonFXConfiguration();
                 config.CurrentLimits =
@@ -72,7 +72,7 @@ public class SwerveTest extends TimedRobot {
             TargetType.Velocity
         ),
         Motor.fromTalonFX( // bl
-            3, 
+            6, 
             motor -> {
                 TalonFXConfiguration config = new TalonFXConfiguration();
                 config.CurrentLimits =
@@ -114,17 +114,17 @@ public class SwerveTest extends TimedRobot {
     };
     private Motor[] angleMotors = new Motor[] {
         Motor.fromSparkMax(
-            5, 
-            true, 
+            9, 
+            false, 
             spark -> {
                 SparkMaxConfig config = new SparkMaxConfig();
                 config.inverted(false).smartCurrentLimit(20).idleMode(IdleMode.kBrake);
                 config
                     .encoder
-                    .positionConversionFactor(1.0 / 25)
-                    .velocityConversionFactor(1.0 / 25 / 60);
+                    .positionConversionFactor(1/6.75 )
+                    .velocityConversionFactor(1/6.75 / 60);
                 spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-            }, 
+            },
             sim -> {}, 
             0, 
             FeedbackController.fromPID(
@@ -134,19 +134,19 @@ public class SwerveTest extends TimedRobot {
                     controller.setTolerance(0.01);
                 }
             ),
-            Optional.empty(),
+            Optional.of(new FeedforwardConstants(0, 0.58398, 0.84001, 0.14444)),
             TargetType.Position
         ),
         Motor.fromSparkMax(
-            6, 
-            true, 
+            3, 
+            false, 
             spark -> {
                 SparkMaxConfig config = new SparkMaxConfig();
                 config.inverted(false).smartCurrentLimit(20).idleMode(IdleMode.kBrake);
                 config
                     .encoder
-                    .positionConversionFactor(1.0 / 25)
-                    .velocityConversionFactor(1.0 / 25 / 60);
+                    .positionConversionFactor(1/6.75 )
+                    .velocityConversionFactor(1/6.75 / 60);
                 spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
             }, 
             sim -> {}, 
@@ -163,14 +163,14 @@ public class SwerveTest extends TimedRobot {
         ),
         Motor.fromSparkMax(
             7, 
-            true, 
+            false, 
             spark -> {
                 SparkMaxConfig config = new SparkMaxConfig();
                 config.inverted(false).smartCurrentLimit(20).idleMode(IdleMode.kBrake);
                 config
                     .encoder
-                    .positionConversionFactor(1.0 / 25)
-                    .velocityConversionFactor(1.0 / 25 / 60);
+                    .positionConversionFactor(1/6.75 )
+                    .velocityConversionFactor(1/6.75 / 60);
                 spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
             }, 
             sim -> {}, 
@@ -186,15 +186,15 @@ public class SwerveTest extends TimedRobot {
             TargetType.Position
         ),
         Motor.fromSparkMax(
-            8, 
-            true, 
+            5, 
+            false, 
             spark -> {
                 SparkMaxConfig config = new SparkMaxConfig();
                 config.inverted(false).smartCurrentLimit(20).idleMode(IdleMode.kBrake);
                 config
                     .encoder
-                    .positionConversionFactor(1.0 / 25)
-                    .velocityConversionFactor(1.0 / 25 / 60);
+                    .positionConversionFactor(1/6.75 )
+                    .velocityConversionFactor(1/6.75 / 60);
                 spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
             }, 
             sim -> {}, 
@@ -206,18 +206,28 @@ public class SwerveTest extends TimedRobot {
                     controller.setTolerance(0.01);
                 }
             ),
-            Optional.empty(),
+            Optional.of(new FeedforwardConstants(0, 0.81751, 0.81766, 0.81766)),
             TargetType.Position
         ),
-    };
-    private AnalogEncoder[] encoders = new AnalogEncoder[] {
-        new AnalogEncoder(0),
-        new AnalogEncoder(1),
-        new AnalogEncoder(2),
-        new AnalogEncoder(3)
-    };
-    private double[] offsets = new double[] {0, 0, 0, 0};    
+    }; 
     public SwerveTest() {
+        HoundLog.setEnabled(true);
+        HoundLog.setOptions(new DogLogOptions(() -> !DriverStation.isFMSAttached(), true, true, true, true, 1000));
+        SysIDCommands commands = identifyAngleMotors();
+        SmartDashboard.putData("Dynamic Forward", commands.dynamicForward());
+        SmartDashboard.putData("Dynamic Reverse", commands.dynamicReverse());
+        SmartDashboard.putData("Quasistatic Forward", commands.quasistaticForward());
+        SmartDashboard.putData("Quasistatic Reverse", commands.quasistaticReverse());
+    }
+
+    public SysIDCommands identifyDriveMotors() {
+        return driveMotors[0].getSynchronizedSysIDCommands(
+            "DriveMotors", 
+            0.5, 
+            5, 
+            10, 
+            driveMotors[1], driveMotors[2], driveMotors[3]
+        );
     }
 
     public SysIDCommands identifyAngleMotors() {
@@ -230,7 +240,21 @@ public class SwerveTest extends TimedRobot {
         );
     }
 
-    
+    public Command tuneDriveMotors(XboxController xbox) {
+        return Commands.run(() -> {
+            double target = -xbox.getLeftY() * 4;
+            for (Motor motor : driveMotors) {
+                motor.setTarget(target);
+            }
+        }).finallyDo(
+            () -> {
+                for (Motor motor : driveMotors) {
+                    motor.setVoltage(0);
+                }
+            }
+        );
+    }
+
     public Command tuneAngleMotors(XboxController xbox) {
         return Commands.run(() -> {
             double target = Math.atan2(-xbox.getLeftY(), -xbox.getLeftX());
@@ -247,34 +271,11 @@ public class SwerveTest extends TimedRobot {
         );
     }
     
-    public Command testAngleMotors() {
-        return Commands.runOnce(() -> {
-                for (Motor motor : angleMotors) {
-                    motor.setVoltage(12);
-                }
-            }, angleMotors
-        ).andThen(
-            Commands.idle()
-        ).finallyDo(
-            () -> {
-                for (Motor motor : angleMotors) {
-                    motor.setVoltage(0);
-                }
-            }
-        );
-    }
-
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
         HoundLog.log("Drive Motors", driveMotors);
         HoundLog.log("Angle Motors", angleMotors);
-        HoundLog.log("Encoder Readings", new double[] {
-            encoders[0].get() - offsets[0],
-            encoders[1].get() - offsets[1],
-            encoders[2].get() - offsets[2],
-            encoders[3].get() - offsets[3],
-        });
     }
 }
 
