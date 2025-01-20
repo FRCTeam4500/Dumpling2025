@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.swerve.Swerve;
-import frc.robot.utilities.gamepieces.Gamepiece;
 import frc.robot.utilities.gamepieces.GamepieceManager;
 import frc.robot.utilities.logging.HoundLog;
 import java.util.Set;
@@ -68,14 +67,9 @@ public class Robot extends TimedRobot {
   }
 
   public void setupLogging() {
-    DogLogOptions homeOptions = new DogLogOptions(true, true, true, true, true, 1000);
-    DogLogOptions compOptions = new DogLogOptions(false, true, true, true, true, 1000);
     HoundLog.setEnabled(true);
     HoundLog.setPdh(new PowerDistribution());
-    HoundLog.setOptions(homeOptions);
-    Trigger atComp = new Trigger(() -> DriverStation.isFMSAttached());
-    atComp.onTrue(Commands.runOnce(() -> HoundLog.setOptions(compOptions)));
-    atComp.onFalse(Commands.runOnce(() -> HoundLog.setOptions(homeOptions)));
+    HoundLog.setOptions(new DogLogOptions(() -> !DriverStation.isFMSAttached(), true, true, true, true, 1000));
     GamepieceManager.resetField();
   }
 
